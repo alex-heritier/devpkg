@@ -1,4 +1,0 @@
-- run program as "devpkg [URL]"
-- register URL to a database if new
-- download source from URL
-- run ./configure, make, make install on the source

@@ -15,10 +15,10 @@ typedef struct Database {
 } Database;
 
 int test(Database *db, char *data);
-Database *DB_create(char *filename);
-int DB_find(Database *db, char *data);
-int DB_add(Database *db, char *data);
-void DB_print(Database *db);
-int DB_save(Database *db);
+Database *DB_create(const char *filename);
+int DB_find(const Database *db, const char *data);
+int DB_add(Database *db, const char *data);
+void DB_print(const Database *db);
+int DB_save(const Database *db);
 
 #endif	//DB_H

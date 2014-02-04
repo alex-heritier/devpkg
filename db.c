@@ -8,8 +8,8 @@
 
 //tests the functions for correctness
 
-static int is_empty(char *data);
-int DB_save(Database *db);
+static int is_empty(const char *data);
+int DB_save(const Database *db);
 
 int test(Database *db, char *data)
 {
@@ -34,33 +34,25 @@ int test(Database *db, char *data)
 
 //loads entries from database file
 
-int load_entries(Database *db, char *filename)
+int load_entries(Entry *ent, const char *filename)
 {
-	//TODO
-	//-open file
-	//-read line from file
-	//	-if line is blank, get next line
-	//	-if line is not blank, add to db
 	FILE *fp = fopen(filename, "r");
 	if(!fp) fp = fopen(filename, "w+");
-	assert(fp);
+	if(!fp) {
+		fprintf(stderr, "Database file could not be loaded.\n");
+		return -1;
+	}
 	
 	char temp[MAX_DATA] = {'\0'};
-	Entry *current_entry = &db->entries[0];
 	while(!feof(fp)) {
 		char *rc = fgets(temp, MAX_DATA, fp);
 		if (!rc) break;	//if rc is NULL, fgets reached EOF
 		if (!is_empty(temp)) {
 			temp[strlen(temp)-1] = '\0';	//trim trailing newline
-			memcpy(current_entry->data, temp, MAX_DATA);
-			current_entry++;
+			memcpy(ent->data, temp, MAX_DATA);
+			ent++;
 		}
 	}
-	/*
-	for (int i = 0; i < MAX_ENTRIES; i++) {
-		memset(&db->entries[i].data, '\0', MAX_DATA);
-	}
-	*/
 	
 	fclose(fp);
 	return 1;
@@ -68,13 +60,13 @@ int load_entries(Database *db, char *filename)
 
 //allocates memory for a Database, initializes the variables and returns a pointer to it
 
-Database *DB_create(char *filename)
+Database *DB_create(const char *filename)
 {
 	assert(filename);
 	
 	Database *db = (Database *)malloc(sizeof(Database));
 	db->filename = strdup(filename);
-	load_entries(db, filename);
+	load_entries(db->entries, filename);
 	db->entry_num = 0;
 	
 	return db;
@@ -82,7 +74,7 @@ Database *DB_create(char *filename)
 
 //checks if the Database has an entry with the given data
 
-int DB_find(Database *db, char *data)
+int DB_find(const Database *db, const char *data)
 {
 	assert(db);
 	assert(data);
@@ -95,7 +87,7 @@ int DB_find(Database *db, char *data)
 
 //checks if an Entry is filled with NULL
 
-static int is_empty(char *data)
+static int is_empty(const char *data)
 {
 	assert(data);
 	for (int i = 0; i < MAX_DATA; i++) {
@@ -106,7 +98,7 @@ static int is_empty(char *data)
 
 //adds an entry to a Database
 
-int DB_add(Database *db, char *data)
+int DB_add(Database *db, const char *data)
 {
 	assert(db);
 	assert(data);
@@ -124,7 +116,7 @@ int DB_add(Database *db, char *data)
 
 //prints the entry data in a list
 
-void DB_print(Database *db)
+void DB_print(const Database *db)
 {
 	assert(db);
 	
@@ -137,7 +129,7 @@ void DB_print(Database *db)
 
 //saves Database to a file
 
-int DB_save(Database *db)
+int DB_save(const Database *db)
 {
 	FILE *fp = fopen(db->filename, "w");
 	assert(fp);
